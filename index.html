@@ -5,125 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calc Time</title>
     <style>
+        body {
+            background: #0d1117;
+            color: #e6e6e6;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 40px 10px;
+        }
+
+        h1 {
+            color: #4da3ff;
+            margin-bottom: 15px;
+        }
+
         .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            gap: 25px;
+            max-width: 900px;
+            margin: auto;
         }
 
         .item {
-            border: 1px solid #ccc;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #1f2937;
+            padding: 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+        }
+
+        label {
+            color: #cfcfcf;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            margin: 6px 2px;
+            color: #fff;
+            background: #111827;
+            border: 1px solid #4da3ff55;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4da3ff;
+            box-shadow: 0 0 8px #4da3ff77;
+        }
+
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 10px 18px;
+            background: #4da3ff33;
+            border: 1px solid #4da3ff88;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        input[type="submit"]:hover {
+            background: #4da3ff55;
+            box-shadow: 0 0 10px #4da3ff77;
+        }
+
+        #resultado_dif, #resultado_des {
+            margin-top: 12px;
+            font-size: 18px;
+            color: #9ecbff;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="item">
             <h1>Calculadora de Diferença de Tempo</h1>
-            <form id="diferenca_tempo" method="post">
-                <label for="hora_inicio">Hora de início: </label><br>
-                <input type="number" id="hora_inicio_horas_dif" name="hora_inicio_horas" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_inicio_minutos_dif" name="hora_inicio_minutos" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
-                
-                <label for="hora_fim">Hora Final: </label><br>
-                <input type="number" id="hora_fim_horas_dif" name="hora_fim_horas" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_fim_minutos_dif" name="hora_fim_minutos" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
-                
+
+            <form id="diferenca_tempo">
+                <label>Hora de início:</label><br>
+                <input type="number" id="hora_inicio_horas_dif" min="0" max="23" placeholder="HH" required maxlength="2"> :
+                <input type="number" id="hora_inicio_minutos_dif" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
+
+                <label>Hora Final:</label><br>
+                <input type="number" id="hora_fim_horas_dif" min="0" max="23" placeholder="HH" required maxlength="2"> :
+                <input type="number" id="hora_fim_minutos_dif" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
+
                 <input type="submit" value="Calcular diferença de tempo">
             </form>
-        
+
             <div id="resultado_dif"></div>
         </div>
+
         <div class="item">
             <h1>Descontar Horas</h1>
-            <form id="diminuir_tempo" method="post">
-                <label for="hora_inicio">Hora de início: </label><br>
-                <input type="number" id="hora_inicio_horas_des" name="hora_inicio_horas" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_inicio_minutos_des" name="hora_inicio_minutos" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
-                <label for="minutos">Minutos a diminuir: </label>
-                <input type="number" id="minutos_des" name="minutos" required><br><br>
+
+            <form id="diminuir_tempo">
+                <label>Hora de início:</label><br>
+                <input type="number" id="hora_inicio_horas_des" min="0" max="23" placeholder="HH" required maxlength="2"> :
+                <input type="number" id="hora_inicio_minutos_des" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
+
+                <label>Minutos a diminuir:</label><br>
+                <input type="number" id="minutos_des" required><br><br>
+
                 <input type="submit" value="Diminuir horas">
             </form>
+
             <div id="resultado_des"></div>
         </div>
     </div>
 
     <script>
-        // Limita o comprimento máximo dos campos de entrada de hora
-        var inputsHoras = document.querySelectorAll('input[type="number"]');
-        inputsHoras.forEach(function(input) {
-            input.addEventListener('input', function() {
+        // Limita automaticamente para dois dígitos e pula para o próximo campo
+        document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            input.addEventListener('input', function () {
                 if (this.value.length >= 2) {
-                    // Se o campo tiver dois dígitos, mova o foco para o próximo campo de entrada
-                    var nextInput = this.nextElementSibling;
-                    if (nextInput && nextInput.tagName === 'INPUT') {
-                        nextInput.focus();
-                    }
+                    let next = this.nextElementSibling;
+                    if (next && next.tagName === "INPUT") next.focus();
                 }
             });
-        });
 
-        // Corrige a separação ao colar uma hora no formato "HH:MM"
-        document.querySelectorAll('input[type="number"]').forEach(function(input) {
-            input.addEventListener('paste', function(event) {
+            // Colar "HH:MM"
+            input.addEventListener('paste', function (event) {
                 var pasteData = event.clipboardData.getData('text/plain');
                 var splitData = pasteData.split(':');
-                if (splitData.length === 2 && !isNaN(parseInt(splitData[0])) && !isNaN(parseInt(splitData[1]))) {
+
+                if (splitData.length === 2) {
                     var hours = parseInt(splitData[0]);
                     var minutes = parseInt(splitData[1]);
-                    var nextInput = input.nextElementSibling;
-                    if (nextInput && nextInput.tagName === 'INPUT') {
-                        input.value = hours.toString().padStart(2, '0');
-                        nextInput.value = minutes.toString().padStart(2, '0');
-                        nextInput.focus();
+
+                    if (!isNaN(hours) && !isNaN(minutes)) {
+                        this.value = hours.toString().padStart(2, '0');
+                        let next = this.nextElementSibling;
+                        if (next && next.tagName === "INPUT") {
+                            next.value = minutes.toString().padStart(2, '0');
+                            next.focus();
+                        }
                         event.preventDefault();
                     }
                 }
             });
         });
 
+        // Diferença de tempo
         document.getElementById("diferenca_tempo").addEventListener("submit", function(event) {
-            event.preventDefault(); // Previne o envio do formulário normalmente
-            
-            // Obter os valores do formulário
-            var horaInicioHoras = parseInt(document.getElementById("hora_inicio_horas_dif").value);
-            var horaInicioMinutos = parseInt(document.getElementById("hora_inicio_minutos_dif").value);
-            var horaFimHoras = parseInt(document.getElementById("hora_fim_horas_dif").value);
-            var horaFimMinutos = parseInt(document.getElementById("hora_fim_minutos_dif").value);
-            
-            // Calcular a diferença em minutos
-            var diferencaMinutos = (horaFimHoras * 60 + horaFimMinutos) - (horaInicioHoras * 60 + horaInicioMinutos);
-            
-            // Converter a diferença para horas e minutos
-            var horas = Math.floor(diferencaMinutos / 60);
-            var minutos = diferencaMinutos % 60;
-            
-            // Exibir o resultado
-            document.getElementById("resultado_dif").innerText = "Diferença de tempo: " + horas + " horas e " + minutos + " minutos";
+            event.preventDefault();
+
+            let hiH = parseInt(document.getElementById("hora_inicio_horas_dif").value);
+            let hiM = parseInt(document.getElementById("hora_inicio_minutos_dif").value);
+            let hfH = parseInt(document.getElementById("hora_fim_horas_dif").value);
+            let hfM = parseInt(document.getElementById("hora_fim_minutos_dif").value);
+
+            let dif = (hfH * 60 + hfM) - (hiH * 60 + hiM);
+
+            let h = Math.floor(dif / 60);
+            let m = dif % 60;
+
+            document.getElementById("resultado_dif").innerText =
+                "Diferença de tempo: " + h + " horas e " + m + " minutos";
         });
 
+        // Diminuir tempo
         document.getElementById("diminuir_tempo").addEventListener("submit", function(event) {
-            event.preventDefault(); // Previne o envio do formulário normalmente
-            
-            // Obter os valores do formulário
-            var horaInicioHoras = parseInt(document.getElementById("hora_inicio_horas_des").value);
-            var horaInicioMinutos = parseInt(document.getElementById("hora_inicio_minutos_des").value);
-            var minutos = parseInt(document.getElementById("minutos_des").value);
-            
-            // Calcular a diferença em minutos
-            var diferenca_Minutos = (horaInicioHoras * 60 + horaInicioMinutos) - minutos;
-            
-            // Converter a diferença para horas e minutos
-            var horas = Math.floor(diferenca_Minutos / 60);
-            var minutos_restantes = diferenca_Minutos % 60;
-            
-            // Exibir o resultado
-            document.getElementById("resultado_des").innerText = "Resultado: " + horas + " horas e " + minutos_restantes + " minutos.";
+            event.preventDefault();
+
+            let h = parseInt(document.getElementById("hora_inicio_horas_des").value);
+            let m = parseInt(document.getElementById("hora_inicio_minutos_des").value);
+            let sub = parseInt(document.getElementById("minutos_des").value);
+
+            let total = (h * 60 + m) - sub;
+
+            let hFinal = Math.floor(total / 60);
+            let mFinal = total % 60;
+
+            document.getElementById("resultado_des").innerText =
+                "Resultado: " + hFinal + " horas e " + mFinal + " minutos.";
         });
     </script>
+
 </body>
 </html>
