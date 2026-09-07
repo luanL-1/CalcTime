@@ -74,6 +74,29 @@
             box-shadow: 0 0 10px #4da3ff77;
         }
 
+        .acoes {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-acao {
+            padding: 8px 12px;
+            background: #4da3ff22;
+            border: 1px solid #4da3ff66;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-acao:hover {
+            background: #4da3ff44;
+            box-shadow: 0 0 8px #4da3ff55;
+        }
+
         #resultado_dif, #resultado_des {
             margin-top: 12px;
             font-size: 18px;
@@ -106,6 +129,10 @@
             </form>
 
             <div id="resultado_dif"></div>
+            <div class="acoes">
+                <button type="button" class="btn-acao" onclick="copiarResultado('resultado_dif')">📋 Copiar</button>
+                <button type="button" class="btn-acao" onclick="limparDiferenca()">🧹 Limpar</button>
+            </div>
         </div>
 
         <div class="item">
@@ -123,6 +150,10 @@
             </form>
 
             <div id="resultado_des"></div>
+            <div class="acoes">
+                <button type="button" class="btn-acao" onclick="copiarResultado('resultado_des')">📋 Copiar</button>
+                <button type="button" class="btn-acao" onclick="limparDesconto()">🧹 Limpar</button>
+            </div>
         </div>
     </div>
 
@@ -157,6 +188,52 @@
                 }
             });
         });
+
+        function copiarResultado(id) {
+            const elemento = document.getElementById(id);
+            const texto = elemento.innerText.trim();
+
+            if (!texto) return;
+
+            // Extrai apenas horas e minutos do resultado exibido.
+            // Ex.: 2 horas e 5 minutos -> 02:05
+            //      0 horas e 31 minutos -> 31
+            const match = texto.match(/(-?\d+)\s*horas?\s*e\s*(-?\d+)\s*minutos?/i);
+            let textoCopiar = texto;
+
+            if (match) {
+                const horas = parseInt(match[1], 10);
+                const minutos = parseInt(match[2], 10);
+
+                if (horas === 0) {
+                    textoCopiar = Math.abs(minutos) + " minutos";
+                } else {
+                    const sinal = horas < 0 || minutos < 0 ? "-" : "";
+                    textoCopiar = sinal + Math.abs(horas) + " " + (Math.abs(horas) === 1 ? "hora" : "horas") +
+                        " e " + Math.abs(minutos) + " " + (Math.abs(minutos) === 1 ? "minuto" : "minutos");
+                }
+            }
+
+            navigator.clipboard.writeText(textoCopiar).then(function() {
+                const original = elemento.innerText;
+                elemento.innerText = original + "  ✓ Copiado";
+                setTimeout(function() {
+                    elemento.innerText = original;
+                }, 1200);
+            });
+        }
+
+        function limparDiferenca() {
+            document.getElementById("diferenca_tempo").reset();
+            document.getElementById("resultado_dif").innerText = "";
+            document.getElementById("hora_inicio_horas_dif").focus();
+        }
+
+        function limparDesconto() {
+            document.getElementById("diminuir_tempo").reset();
+            document.getElementById("resultado_des").innerText = "";
+            document.getElementById("hora_inicio_horas_des").focus();
+        }
 
         // Diferença de tempo
         document.getElementById("diferenca_tempo").addEventListener("submit", function(event) {
