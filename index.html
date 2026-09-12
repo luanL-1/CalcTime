@@ -1,9 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calc Time</title>
+
     <style>
         body {
             background: #0d1117;
@@ -97,7 +99,8 @@
             box-shadow: 0 0 8px #4da3ff55;
         }
 
-        #resultado_dif, #resultado_des {
+        #resultado_dif,
+        #resultado_des {
             margin-top: 12px;
             font-size: 18px;
             color: #9ecbff;
@@ -110,166 +113,643 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
+
+        <!-- CALCULADORA DE DIFERENÇA -->
         <div class="item">
+
             <h1>Calculadora de Diferença de Tempo</h1>
 
             <form id="diferenca_tempo">
+
                 <label>Hora de início:</label><br>
-                <input type="number" id="hora_inicio_horas_dif" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_inicio_minutos_dif" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
+
+                <input
+                    type="number"
+                    id="hora_inicio_horas_dif"
+                    min="0"
+                    max="23"
+                    placeholder="HH"
+                    required
+                > :
+
+                <input
+                    type="number"
+                    id="hora_inicio_minutos_dif"
+                    min="0"
+                    max="59"
+                    placeholder="MM"
+                    required
+                >
+
+                <br><br>
 
                 <label>Hora Final:</label><br>
-                <input type="number" id="hora_fim_horas_dif" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_fim_minutos_dif" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
 
-                <input type="submit" value="Calcular diferença de tempo">
+                <input
+                    type="number"
+                    id="hora_fim_horas_dif"
+                    min="0"
+                    max="23"
+                    placeholder="HH"
+                    required
+                > :
+
+                <input
+                    type="number"
+                    id="hora_fim_minutos_dif"
+                    min="0"
+                    max="59"
+                    placeholder="MM"
+                    required
+                >
+
+                <br><br>
+
+                <input
+                    type="submit"
+                    value="Calcular diferença de tempo"
+                >
+
             </form>
 
             <div id="resultado_dif"></div>
+
             <div class="acoes">
-                <button type="button" class="btn-acao" onclick="copiarResultado('resultado_dif')">📋 Copiar</button>
-                <button type="button" class="btn-acao" onclick="limparDiferenca()">🧹 Limpar</button>
+
+                <button
+                    type="button"
+                    class="btn-acao"
+                    onclick="copiarResultado('resultado_dif')"
+                >
+                    📋 Copiar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-acao"
+                    onclick="limparDiferenca()"
+                >
+                    🧹 Limpar
+                </button>
+
             </div>
+
         </div>
 
+
+        <!-- DESCONTAR HORAS -->
         <div class="item">
+
             <h1>Descontar Horas</h1>
 
             <form id="diminuir_tempo">
+
                 <label>Hora de início:</label><br>
-                <input type="number" id="hora_inicio_horas_des" min="0" max="23" placeholder="HH" required maxlength="2"> :
-                <input type="number" id="hora_inicio_minutos_des" min="0" max="59" placeholder="MM" required maxlength="2"><br><br>
+
+                <input
+                    type="number"
+                    id="hora_inicio_horas_des"
+                    min="0"
+                    max="23"
+                    placeholder="HH"
+                    required
+                > :
+
+                <input
+                    type="number"
+                    id="hora_inicio_minutos_des"
+                    min="0"
+                    max="59"
+                    placeholder="MM"
+                    required
+                >
+
+                <br><br>
 
                 <label>Minutos a diminuir:</label><br>
-                <input type="number" id="minutos_des" required><br><br>
 
-                <input type="submit" value="Diminuir horas">
+                <input
+                    type="number"
+                    id="minutos_des"
+                    min="0"
+                    required
+                >
+
+                <br><br>
+
+                <input
+                    type="submit"
+                    value="Diminuir horas"
+                >
+
             </form>
 
             <div id="resultado_des"></div>
+
             <div class="acoes">
-                <button type="button" class="btn-acao" onclick="copiarResultado('resultado_des')">📋 Copiar</button>
-                <button type="button" class="btn-acao" onclick="limparDesconto()">🧹 Limpar</button>
+
+                <button
+                    type="button"
+                    class="btn-acao"
+                    onclick="copiarResultado('resultado_des')"
+                >
+                    📋 Copiar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-acao"
+                    onclick="limparDesconto()"
+                >
+                    🧹 Limpar
+                </button>
+
             </div>
+
         </div>
+
     </div>
 
+
     <script>
-        // Limita automaticamente para dois dígitos e pula para o próximo campo
+
+        /*
+        ==========================================================
+        CAMPOS DE HORA
+        ==========================================================
+        */
+
         document.querySelectorAll('input[type="number"]').forEach(function(input) {
+
             input.addEventListener('input', function () {
-                if (this.value.length >= 2) {
-                    let next = this.nextElementSibling;
-                    if (next && next.tagName === "INPUT") next.focus();
+
+                /*
+                Só avança automaticamente nos campos
+                que representam HH ou MM.
+                */
+
+                if (
+                    this.placeholder === "HH" ||
+                    this.placeholder === "MM"
+                ) {
+
+                    if (this.value.length >= 2) {
+
+                        let next = this.nextElementSibling;
+
+                        if (
+                            next &&
+                            next.tagName === "INPUT"
+                        ) {
+                            next.focus();
+                        }
+                    }
                 }
             });
 
-            // Colar "HH:MM"
+
+            /*
+            Permite colar:
+            08:30
+            14:45
+            etc.
+            */
+
             input.addEventListener('paste', function (event) {
-                var pasteData = event.clipboardData.getData('text/plain');
-                var splitData = pasteData.split(':');
+
+                if (
+                    this.placeholder !== "HH" &&
+                    this.placeholder !== "MM"
+                ) {
+                    return;
+                }
+
+                const pasteData =
+                    event.clipboardData.getData('text/plain');
+
+                const splitData =
+                    pasteData.trim().split(':');
+
 
                 if (splitData.length === 2) {
-                    var hours = parseInt(splitData[0]);
-                    var minutes = parseInt(splitData[1]);
 
-                    if (!isNaN(hours) && !isNaN(minutes)) {
-                        this.value = hours.toString().padStart(2, '0');
-                        let next = this.nextElementSibling;
-                        if (next && next.tagName === "INPUT") {
-                            next.value = minutes.toString().padStart(2, '0');
+                    const hours =
+                        parseInt(splitData[0], 10);
+
+                    const minutes =
+                        parseInt(splitData[1], 10);
+
+
+                    if (
+                        !isNaN(hours) &&
+                        !isNaN(minutes) &&
+                        hours >= 0 &&
+                        hours <= 23 &&
+                        minutes >= 0 &&
+                        minutes <= 59
+                    ) {
+
+                        this.value =
+                            hours
+                                .toString()
+                                .padStart(2, '0');
+
+
+                        let next =
+                            this.nextElementSibling;
+
+
+                        if (
+                            next &&
+                            next.tagName === "INPUT"
+                        ) {
+
+                            next.value =
+                                minutes
+                                    .toString()
+                                    .padStart(2, '0');
+
                             next.focus();
                         }
+
+
                         event.preventDefault();
                     }
                 }
             });
+
         });
+
+
+        /*
+        ==========================================================
+        COPIAR RESULTADO
+        ==========================================================
+
+        O resultado exibido continua:
+
+        1 hora e 20 minutos
+
+        Mas o que vai para a área de transferência será:
+
+        01:20
+        ==========================================================
+        */
 
         function copiarResultado(id) {
-            const elemento = document.getElementById(id);
-            const texto = elemento.innerText.trim();
 
-            if (!texto) return;
+            const elemento =
+                document.getElementById(id);
 
-            // Extrai apenas horas e minutos do resultado exibido.
-            // Ex.: 2 horas e 5 minutos -> 02:05
-            //      0 horas e 31 minutos -> 31
-            const match = texto.match(/(-?\d+)\s*horas?\s*e\s*(-?\d+)\s*minutos?/i);
-            let textoCopiar = texto;
+            const texto =
+                elemento.innerText.trim();
 
-            if (match) {
-                const horas = parseInt(match[1], 10);
-                const minutos = parseInt(match[2], 10);
 
-                if (horas === 0) {
-                    textoCopiar = Math.abs(minutos) + " minutos";
-                } else {
-                    const sinal = horas < 0 || minutos < 0 ? "-" : "";
-                    textoCopiar = sinal + Math.abs(horas) + " " + (Math.abs(horas) === 1 ? "hora" : "horas") +
-                        " e " + Math.abs(minutos) + " " + (Math.abs(minutos) === 1 ? "minuto" : "minutos");
-                }
+            if (!texto) {
+                return;
             }
 
-            navigator.clipboard.writeText(textoCopiar).then(function() {
-                const original = elemento.innerText;
-                elemento.innerText = original + "  ✓ Copiado";
-                setTimeout(function() {
-                    elemento.innerText = original;
-                }, 1200);
-            });
+
+            /*
+            Procura algo como:
+
+            1 horas e 20 minutos
+            3 horas e 35 minutos
+            10 horas e 50 minutos
+            */
+
+            const match = texto.match(
+                /(-?\d+)\s*horas?\s*e\s*(-?\d+)\s*minutos?/i
+            );
+
+
+            if (!match) {
+                return;
+            }
+
+
+            let horas =
+                parseInt(match[1], 10);
+
+            let minutos =
+                parseInt(match[2], 10);
+
+
+            /*
+            Detecta resultado negativo.
+            */
+
+            const negativo =
+                horas < 0 || minutos < 0;
+
+
+            horas =
+                Math.abs(horas);
+
+            minutos =
+                Math.abs(minutos);
+
+
+            /*
+            Converte para HH:MM
+            */
+
+            const horasFormatadas =
+                horas
+                    .toString()
+                    .padStart(2, "0");
+
+
+            const minutosFormatados =
+                minutos
+                    .toString()
+                    .padStart(2, "0");
+
+
+            const textoCopiar =
+                (negativo ? "-" : "") +
+                horasFormatadas +
+                ":" +
+                minutosFormatados;
+
+
+            /*
+            Copia para área de transferência.
+            */
+
+            navigator.clipboard
+                .writeText(textoCopiar)
+                .then(function () {
+
+                    const original =
+                        elemento.innerText;
+
+
+                    elemento.innerText =
+                        original +
+                        "  ✓ Copiado: " +
+                        textoCopiar;
+
+
+                    setTimeout(function () {
+
+                        elemento.innerText =
+                            original;
+
+                    }, 1200);
+
+                });
+
         }
+
+
+        /*
+        ==========================================================
+        LIMPAR DIFERENÇA
+        ==========================================================
+        */
 
         function limparDiferenca() {
-            document.getElementById("diferenca_tempo").reset();
-            document.getElementById("resultado_dif").innerText = "";
-            document.getElementById("hora_inicio_horas_dif").focus();
+
+            document
+                .getElementById("diferenca_tempo")
+                .reset();
+
+
+            document
+                .getElementById("resultado_dif")
+                .innerText = "";
+
+
+            document
+                .getElementById("hora_inicio_horas_dif")
+                .focus();
+
         }
+
+
+        /*
+        ==========================================================
+        LIMPAR DESCONTO
+        ==========================================================
+        */
 
         function limparDesconto() {
-            document.getElementById("diminuir_tempo").reset();
-            document.getElementById("resultado_des").innerText = "";
-            document.getElementById("hora_inicio_horas_des").focus();
+
+            document
+                .getElementById("diminuir_tempo")
+                .reset();
+
+
+            document
+                .getElementById("resultado_des")
+                .innerText = "";
+
+
+            document
+                .getElementById("hora_inicio_horas_des")
+                .focus();
+
         }
 
-        // Diferença de tempo
-        document.getElementById("diferenca_tempo").addEventListener("submit", function(event) {
-            event.preventDefault();
 
-            let hiH = parseInt(document.getElementById("hora_inicio_horas_dif").value);
-            let hiM = parseInt(document.getElementById("hora_inicio_minutos_dif").value);
-            let hfH = parseInt(document.getElementById("hora_fim_horas_dif").value);
-            let hfM = parseInt(document.getElementById("hora_fim_minutos_dif").value);
+        /*
+        ==========================================================
+        CALCULAR DIFERENÇA DE TEMPO
+        ==========================================================
+        */
 
-            let dif = (hfH * 60 + hfM) - (hiH * 60 + hiM);
+        document
+            .getElementById("diferenca_tempo")
+            .addEventListener(
+                "submit",
+                function(event) {
 
-            let h = Math.floor(dif / 60);
-            let m = dif % 60;
+                    event.preventDefault();
 
-            document.getElementById("resultado_dif").innerText =
-                "Diferença de tempo: " + h + " horas e " + m + " minutos";
-        });
 
-        // Diminuir tempo
-        document.getElementById("diminuir_tempo").addEventListener("submit", function(event) {
-            event.preventDefault();
+                    const hiH =
+                        parseInt(
+                            document
+                                .getElementById("hora_inicio_horas_dif")
+                                .value,
+                            10
+                        );
 
-            let h = parseInt(document.getElementById("hora_inicio_horas_des").value);
-            let m = parseInt(document.getElementById("hora_inicio_minutos_des").value);
-            let sub = parseInt(document.getElementById("minutos_des").value);
 
-            let total = (h * 60 + m) - sub;
+                    const hiM =
+                        parseInt(
+                            document
+                                .getElementById("hora_inicio_minutos_dif")
+                                .value,
+                            10
+                        );
 
-            let hFinal = Math.floor(total / 60);
-            let mFinal = total % 60;
 
-            document.getElementById("resultado_des").innerText =
-                "Resultado: " + hFinal + " horas e " + mFinal + " minutos.";
-        });
+                    const hfH =
+                        parseInt(
+                            document
+                                .getElementById("hora_fim_horas_dif")
+                                .value,
+                            10
+                        );
+
+
+                    const hfM =
+                        parseInt(
+                            document
+                                .getElementById("hora_fim_minutos_dif")
+                                .value,
+                            10
+                        );
+
+
+                    const inicio =
+                        (hiH * 60) + hiM;
+
+
+                    const fim =
+                        (hfH * 60) + hfM;
+
+
+                    const dif =
+                        fim - inicio;
+
+
+                    const negativo =
+                        dif < 0;
+
+
+                    const totalAbsoluto =
+                        Math.abs(dif);
+
+
+                    const h =
+                        Math.floor(
+                            totalAbsoluto / 60
+                        );
+
+
+                    const m =
+                        totalAbsoluto % 60;
+
+
+                    document
+                        .getElementById("resultado_dif")
+                        .innerText =
+
+                        "Diferença de tempo: " +
+
+                        (negativo ? "-" : "") +
+
+                        h +
+
+                        (h === 1
+                            ? " hora e "
+                            : " horas e ") +
+
+                        m +
+
+                        (m === 1
+                            ? " minuto"
+                            : " minutos");
+
+                }
+            );
+
+
+        /*
+        ==========================================================
+        DIMINUIR TEMPO
+        ==========================================================
+        */
+
+        document
+            .getElementById("diminuir_tempo")
+            .addEventListener(
+                "submit",
+                function(event) {
+
+                    event.preventDefault();
+
+
+                    const h =
+                        parseInt(
+                            document
+                                .getElementById("hora_inicio_horas_des")
+                                .value,
+                            10
+                        );
+
+
+                    const m =
+                        parseInt(
+                            document
+                                .getElementById("hora_inicio_minutos_des")
+                                .value,
+                            10
+                        );
+
+
+                    const sub =
+                        parseInt(
+                            document
+                                .getElementById("minutos_des")
+                                .value,
+                            10
+                        );
+
+
+                    let total =
+                        (h * 60 + m) - sub;
+
+
+                    /*
+                    Ajusta caso ultrapasse a meia-noite.
+                    Exemplo:
+
+                    00:20 - 30 minutos = 23:50
+                    */
+
+                    total =
+                        ((total % 1440) + 1440) % 1440;
+
+
+                    const hFinal =
+                        Math.floor(total / 60);
+
+
+                    const mFinal =
+                        total % 60;
+
+
+                    document
+                        .getElementById("resultado_des")
+                        .innerText =
+
+                        "Resultado: " +
+
+                        hFinal +
+
+                        (hFinal === 1
+                            ? " hora e "
+                            : " horas e ") +
+
+                        mFinal +
+
+                        (mFinal === 1
+                            ? " minuto."
+                            : " minutos.");
+
+                }
+            );
+
     </script>
 
 </body>
 </html>
+```
